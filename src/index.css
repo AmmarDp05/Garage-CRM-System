@@ -328,7 +328,7 @@ td small, .cell-detail { display: block; color: #73839d; }
 .grand-total { display: flex; align-items: center; justify-content: space-between; gap: 10px; background: #fff0e5; border: 1px solid #ffe0cd; border-radius: 8px; padding: 10px; font-size: 18px; letter-spacing: -.5px; }
 .grand-total strong:last-child { font-size: 21px; white-space: nowrap; }
 .payment-title { display: flex; align-items: center; gap: 10px; }
-.payment-methods { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; }.payment-methods button { background: #f5f7fa; color: #1d2c43; display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 10px; border-radius: 7px; border: 1px solid #e9edf3; font-size: 10px; }.payment-methods button.active { background: linear-gradient(120deg, #ff6519, #ff4c07); color: white; border-color: #ff8546; }
+.payment-methods { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; }.payment-methods button { background: #f5f7fa; color: #1d2c43; display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 10px; border-radius: 7px; border: 1px solid #e9edf3; font-size: 10px; }.payment-methods button.active { background: linear-gradient(120deg, #ff6519, #ff4c07); color: white; border-color: #ff8546; }
 .cash-fields { display: grid; grid-template-columns: 1.2fr 1fr; gap: 12px; margin: 17px 0; }.cash-fields label { font-size: 10px; display: flex; align-items: center; gap: 7px; flex-wrap: wrap; font-weight: 600; }.cash-fields input, .cash-fields output { display: block; width: 100%; margin-top: 3px; padding: 11px; border: 1px solid #dce3ee; border-radius: 5px; font-size: 13px; color: #203049; min-width: 0; }.cash-fields output { background: #eafbef; border-color: #cbefdc; font-weight: 400; }.cash-fields output.amount-due { background: #fff1e7; border-color: #ffdcc9; }.payment-note { font-size: 11px; line-height: 1.6; color: #71829c; min-height: 68px; margin: 17px 0; padding: 10px; background: #f6f8fb; border-radius: 6px; }
 .generate-invoice, .save-draft { width: 100%; display: flex; align-items: center; justify-content: center; gap: 12px; border-radius: 6px; font-size: 13px; font-weight: 600; padding: 13px; }.generate-invoice { background: linear-gradient(100deg, #ff6218, #ff4d08); color: white; border: 1px solid #ff8040; }.generate-invoice:hover { background: #e94c0d; }.generate-invoice:disabled { opacity: .45; }.save-draft { margin-top: 5px; background: #16212f; color: white; }.save-draft:hover { background: #2c3c52; }
 .summary-actions { display: flex; gap: 7px; margin-top: 13px; }.summary-actions button { display: flex; justify-content: center; align-items: center; gap: 6px; flex: 1; background: #fff; border: 1px solid #e3e9f1; padding: 9px 5px; border-radius: 5px; font-size: 9px; white-space: nowrap; }.summary-actions button:hover { background: #f6f8fb; }.pos-demo-note { display: block; color: #8b99ad; font-size: 9px; margin-top: 11px; text-align: center; }
@@ -659,8 +659,7 @@ td small, .cell-detail { display: block; color: #73839d; }
 .intake-preview-tabs button { min-width: 0; padding: 9px 3px; border-radius: 5px; background: #f4f6f9; color: #62728b; font-size: 9px; white-space: nowrap; }
 .intake-preview-tabs button.active { background: linear-gradient(110deg, #ff5d17, #f04b08); color: #fff; }
 .intake-preview-paper { padding: 13px; border: 1px solid #e6ebf2; background: #fff; color: #18263d; }
-.intake-paper-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding-bottom: 11px; border-bottom: 1px solid #e7ebf1; }
-.intake-paper-header img { display: block; width: min(150px, 54%); height: auto; border-radius: 3px; }
+.intake-paper-header { display: flex; align-items: flex-start; justify-content: flex-end; gap: 12px; padding-bottom: 11px; border-bottom: 1px solid #e7ebf1; }
 .intake-paper-header > div { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; text-align: right; }
 .intake-paper-header strong { font-size: 12px; }
 .intake-paper-header b { font-size: 11px; }
@@ -752,7 +751,6 @@ td small, .cell-detail { display: block; color: #73839d; }
   .intake-field input, .intake-field select, .intake-field textarea { font-size: 10px; }
   .intake-action-button { min-height: 34px; padding: 0 8px; font-size: 10px; }
   .intake-preview-paper { padding: 9px; }
-  .intake-paper-header img { width: min(130px, 53%); }
   .intake-paper-details { gap: 7px; }
   .intake-form-section-title { align-items: flex-start; flex-wrap: wrap; }
   .intake-form-section-title > div { flex: 1 1 calc(100% - 48px); }
@@ -1707,4 +1705,21 @@ td small, .cell-detail { display: block; color: #73839d; }
 @media print {
   .reports-toolbar, .reports-demo-note { display: none !important; }
   .reports-page { margin: 0; padding: 0; }
+}
+
+@media (min-width: 761px) and (max-width: 1150px) {
+  .intake-layout { grid-template-columns: minmax(0, 1fr); }
+  .intake-preview-card { width: 100%; max-width: 640px; margin: 0 auto; }
+  .invoice-management-layout,
+  .vehicle-management-layout,
+  .customer-management-layout,
+  .parts-management-layout,
+  .mechanics-management-layout { grid-template-columns: minmax(0, 1fr); }
+  .invoice-detail-card,
+  .vehicle-detail-card,
+  .customer-detail-card,
+  .parts-detail-card,
+  .mechanic-detail-card { max-width: none; }
+  .reports-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .reports-main-grid { grid-template-columns: minmax(0, 1fr); }
 }

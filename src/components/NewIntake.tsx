@@ -2465,10 +2465,6 @@ function NewIntake({
 
           <article className="intake-preview-paper">
             <header className="intake-paper-header">
-              <img
-                src={`${import.meta.env.BASE_URL}garage-workspace-logo.png`}
-                alt="Garage Workspace"
-              />
               <div>
                 <strong>{step >= 8 ? "INVOICE" : step === 7 && documentType === "Work Order" ? "REPAIR SUMMARY" : documentType.toUpperCase()}</strong>
                 <b>{step >= 8 ? initialInvoiceNumber : documentType === "Quotation" ? quoteNumber : form.workOrder || "—"}</b>
