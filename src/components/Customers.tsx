@@ -1,0 +1,189 @@
+import { useMemo, useState } from "react";
+import {
+  Activity,
+  CalendarDays,
+  CarFront,
+  ChevronLeft,
+  ChevronRight,
+  Clock3,
+  Eye,
+  FileText,
+  Mail,
+  MapPin,
+  MoreVertical,
+  Phone,
+  Plus,
+  Search,
+  UserRound,
+  UsersRound,
+  Wrench,
+} from "lucide-react";
+
+type CustomerType = "Individual" | "Fleet" | "Corporate";
+type CustomerStatus = "Active" | "VIP" | "Inactive" | "Corporate";
+type CustomerVehicle = { model: string; year: string; plate: string; lastService: string };
+type ServiceRecord = { date: string; vehicle: string; service: string; amount: number };
+type Customer = {
+  id: string;
+  name: string;
+  initials: string;
+  phone: string;
+  email: string;
+  address: string;
+  type: CustomerType;
+  vehicleCount: number;
+  lastVisit: string;
+  totalSpent: number;
+  status: CustomerStatus;
+  vehicles: CustomerVehicle[];
+  history: ServiceRecord[];
+  notes: string;
+};
+
+const makeHistory = (vehicle: string, service: string, amount: number): ServiceRecord[] => [
+  { date: "14 Apr 2025", vehicle, service, amount },
+  { date: "12 Mar 2025", vehicle: "Patrol", service: "Brake service", amount: 420 },
+  { date: "15 Jan 2025", vehicle: "Land Cruiser", service: "AC service", amount: 280 },
+];
+
+const featuredCustomers: Customer[] = [
+  { id: "CUST-001", name: "Sheikh Ahmed", initials: "SA", phone: "66871557", email: "sheikh.ahmed@qatar.net", address: "Doha, Qatar", type: "Individual", vehicleCount: 3, lastVisit: "14 Apr 2025", totalSpent: 4280, status: "VIP", vehicles: [{ model: "Toyota Land Cruiser", year: "2020", plate: "770781", lastService: "14 Apr 2025" }, { model: "Nissan Patrol", year: "2019", plate: "660421", lastService: "12 Mar 2025" }, { model: "Lexus RX 350", year: "2021", plate: "662114", lastService: "5 Jan 2025" }], history: makeHistory("Land Cruiser", "Engine oil change", 350), notes: "Prefers genuine parts and regular maintenance. Always requests quick turnaround time." },
+  { id: "CUST-002", name: "Muhammad Muddasir", initials: "MM", phone: "55420123", email: "m.muddasir@example.com", address: "Doha, Qatar", type: "Individual", vehicleCount: 2, lastVisit: "12 Apr 2025", totalSpent: 1850, status: "Active", vehicles: [{ model: "Nissan Patrol", year: "2019", plate: "660421", lastService: "12 Apr 2025" }, { model: "Lexus RX 350", year: "2020", plate: "602114", lastService: "6 Apr 2025" }], history: makeHistory("Patrol", "Brake service", 420), notes: "Regular customer. Prefers appointments in the morning." },
+  { id: "CUST-003", name: "Ali Shah", initials: "AS", phone: "30124567", email: "ali.shah@example.com", address: "Al Rayyan, Qatar", type: "Fleet", vehicleCount: 5, lastVisit: "10 Apr 2025", totalSpent: 6420, status: "Active", vehicles: [{ model: "Lexus ES", year: "2021", plate: "562315", lastService: "10 Apr 2025" }, { model: "Toyota Camry", year: "2020", plate: "445566", lastService: "20 Mar 2025" }, { model: "Honda Accord", year: "2019", plate: "123899", lastService: "12 Feb 2025" }], history: makeHistory("Lexus ES", "Full service", 680), notes: "Fleet account. Contact the customer before starting additional work." },
+  { id: "CUST-004", name: "Khalid Al Marri", initials: "KM", phone: "33118765", email: "khalid.marri@example.com", address: "Doha, Qatar", type: "Corporate", vehicleCount: 4, lastVisit: "11 Apr 2025", totalSpent: 3150, status: "Active", vehicles: [{ model: "Renault Duster", year: "2018", plate: "366730", lastService: "11 Apr 2025" }, { model: "Nissan Sunny", year: "2020", plate: "220033", lastService: "5 Mar 2025" }], history: makeHistory("Duster", "AC service", 820), notes: "Corporate account. Invoices should be sent to the fleet administrator." },
+  { id: "CUST-005", name: "Ahmed Raza", initials: "AR", phone: "66233411", email: "ahmed.raza@example.com", address: "Doha, Qatar", type: "Individual", vehicleCount: 1, lastVisit: "8 Apr 2025", totalSpent: 980, status: "Active", vehicles: [{ model: "BMW X6", year: "2019", plate: "981877", lastService: "8 Apr 2025" }], history: makeHistory("BMW X6", "Brake pads", 720), notes: "Customer prefers text updates when repairs are complete." },
+  { id: "CUST-006", name: "Fahad Khan", initials: "FN", phone: "55667788", email: "fahad.khan@example.com", address: "Al Wakrah, Qatar", type: "Individual", vehicleCount: 2, lastVisit: "6 Apr 2025", totalSpent: 2340, status: "Active", vehicles: [{ model: "Lexus RX 350", year: "2020", plate: "602114", lastService: "6 Apr 2025" }, { model: "Toyota Yaris", year: "2021", plate: "778932", lastService: "3 Jan 2025" }], history: makeHistory("Lexus RX 350", "Tire alignment", 480), notes: "Contact before ordering vehicle-specific parts." },
+  { id: "CUST-007", name: "Bilal Khan", initials: "BN", phone: "50998877", email: "bilal.khan@example.com", address: "Doha, Qatar", type: "Individual", vehicleCount: 1, lastVisit: "3 Apr 2025", totalSpent: 1250, status: "Inactive", vehicles: [{ model: "Toyota Corolla", year: "2021", plate: "554211", lastService: "3 Apr 2025" }], history: makeHistory("Corolla", "General service", 420), notes: "No recent customer activity." },
+  { id: "CUST-008", name: "Zara Noor", initials: "ZN", phone: "66778855", email: "zara.noor@example.com", address: "Lusail, Qatar", type: "Individual", vehicleCount: 2, lastVisit: "2 Apr 2025", totalSpent: 1980, status: "Active", vehicles: [{ model: "Toyota Yaris", year: "2021", plate: "778932", lastService: "2 Apr 2025" }, { model: "Honda Civic", year: "2020", plate: "205667", lastService: "15 Feb 2025" }], history: makeHistory("Toyota Yaris", "Electrical repair", 280), notes: "Customer prefers a call before vehicle pickup." },
+  { id: "CUST-009", name: "Sara Mohammed", initials: "SM", phone: "33221144", email: "sara.mohammed@example.com", address: "Doha, Qatar", type: "Individual", vehicleCount: 1, lastVisit: "1 Apr 2025", totalSpent: 870, status: "Active", vehicles: [{ model: "Honda Civic", year: "2020", plate: "205667", lastService: "1 Apr 2025" }], history: makeHistory("Honda Civic", "General service", 600), notes: "Regular maintenance customer." },
+  { id: "CUST-010", name: "Omar Saeed", initials: "OS", phone: "55887766", email: "omar.saeed@example.com", address: "Al Rayyan, Qatar", type: "Fleet", vehicleCount: 3, lastVisit: "29 Mar 2025", totalSpent: 3560, status: "Corporate", vehicles: [{ model: "Mitsubishi Pajero", year: "2018", plate: "998877", lastService: "29 Mar 2025" }, { model: "Toyota Hilux", year: "2019", plate: "889911", lastService: "8 Mar 2025" }], history: makeHistory("Pajero", "Engine diagnostic", 950), notes: "Fleet account. Send service summaries to the main office." },
+];
+
+const generatedFirstNames = ["Nasser", "Mariam", "Hassan", "Aisha", "Yousef", "Fatima", "Khalid", "Noor", "Rashid", "Layla", "Tariq", "Huda", "Majid", "Sana"];
+const generatedLastNames = ["Ali", "Ahmed", "Khan", "Noor", "Rahman", "Omar", "Saeed", "Salem", "Hassan", "Mansoor", "Raza"];
+const generatedCustomers: Customer[] = Array.from({ length: 146 }, (_, index) => {
+  const idNumber = index + 11;
+  const firstName = generatedFirstNames[index % generatedFirstNames.length];
+  const lastName = generatedLastNames[Math.floor(index / generatedFirstNames.length) % generatedLastNames.length];
+  const name = `${firstName} ${lastName}`;
+  const type: CustomerType = index % 10 === 0 ? "Fleet" : index % 17 === 0 ? "Corporate" : "Individual";
+  const status: CustomerStatus = index % 19 === 0 ? "Inactive" : type === "Corporate" ? "Corporate" : index % 12 === 0 ? "VIP" : "Active";
+  const model = ["Toyota Camry", "Nissan Patrol", "Lexus ES", "Honda Civic"][index % 4];
+  const service = ["Oil change", "Brake service", "AC service", "General service"][index % 4];
+  return {
+    id: `CUST-${String(idNumber).padStart(3, "0")}`,
+    name,
+    initials: name.split(" ").map((part) => part[0]).join(""),
+    phone: `55${String(100000 + idNumber * 137).slice(-6)}`,
+    email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}@example.com`,
+    address: ["Doha, Qatar", "Al Rayyan, Qatar", "Lusail, Qatar"][index % 3],
+    type,
+    vehicleCount: index % 5 + 1,
+    lastVisit: `${String(index % 28 + 1).padStart(2, "0")} Mar 2025`,
+    totalSpent: 650 + index * 37,
+    status,
+    vehicles: [{ model, year: String(2018 + index % 6), plate: String(100000 + idNumber * 17), lastService: `${String(index % 28 + 1).padStart(2, "0")} Mar 2025` }],
+    history: makeHistory(model, service, 250 + (index % 8) * 50),
+    notes: "Customer service preferences and vehicle details recorded for the next visit.",
+  };
+});
+
+const initialCustomers = [...featuredCustomers, ...generatedCustomers];
+const money = (value: number) => `QAR ${value.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+const statusClass: Record<CustomerStatus, string> = { Active: "active", VIP: "vip", Inactive: "inactive", Corporate: "corporate" };
+const typeClass: Record<CustomerType, string> = { Individual: "individual", Fleet: "fleet", Corporate: "corporate" };
+
+function Customers({ notify, onAdd, onCreateWorkOrder }: { notify: (message: string) => void; onAdd: () => void; onCreateWorkOrder: () => void }) {
+  const [customers] = useState(initialCustomers);
+  const [selectedId, setSelectedId] = useState("CUST-001");
+  const [search, setSearch] = useState("");
+  const [typeFilter, setTypeFilter] = useState("All Customer Types");
+  const [statusFilter, setStatusFilter] = useState("All Status");
+  const [page, setPage] = useState(1);
+  const filteredCustomers = useMemo(() => customers.filter((customer) => {
+    const matchesSearch = `${customer.id} ${customer.name} ${customer.phone} ${customer.email}`.toLowerCase().includes(search.trim().toLowerCase());
+    const matchesType = typeFilter === "All Customer Types" || customer.type === typeFilter;
+    const matchesStatus = statusFilter === "All Status" || customer.status === statusFilter;
+    return matchesSearch && matchesType && matchesStatus;
+  }), [customers, search, statusFilter, typeFilter]);
+  const pageCount = Math.max(1, Math.ceil(filteredCustomers.length / 10));
+  const currentPage = Math.min(page, pageCount);
+  const pageCustomers = filteredCustomers.slice((currentPage - 1) * 10, currentPage * 10);
+  const selectedCustomer = filteredCustomers.find((customer) => customer.id === selectedId) ?? filteredCustomers[0] ?? customers.find((customer) => customer.id === selectedId);
+  const counts = { total: 156, active: 142, fleet: 18, newThisMonth: 12 };
+
+  return (
+    <main className="customer-management">
+      <header className="customer-page-heading">
+        <div className="customer-page-title"><span><UserRound size={25} /></span><div><h1>Customers</h1><p>Manage customers, service records, and contact details.</p></div></div>
+        <button className="customer-create-button" onClick={onAdd}><Plus size={18} />Add Customer</button>
+      </header>
+      <section className="customer-metrics" aria-label="Customer summary">
+        <article><span className="customer-metric-icon blue"><UsersRound size={21} /></span><div><strong>{counts.total}</strong><small>Total Customers</small></div><Activity size={23} className="customer-spark blue-text" /></article>
+        <article><span className="customer-metric-icon green"><UserRound size={20} /></span><div><strong>{counts.active}</strong><small>Active Customers</small></div><Activity size={23} className="customer-spark green-text" /></article>
+        <article><span className="customer-metric-icon purple"><UsersRound size={20} /></span><div><strong>{counts.fleet}</strong><small>Fleet Customers</small></div><Activity size={23} className="customer-spark purple-text" /></article>
+        <article><span className="customer-metric-icon orange"><UserRound size={20} /></span><div><strong>{counts.newThisMonth}</strong><small>New This Month</small></div><Activity size={23} className="customer-spark orange-text" /></article>
+      </section>
+      <div className="customer-management-layout">
+        <section className="customer-list-card">
+          <div className="customer-filters">
+            <label className="customer-search"><Search size={16} /><input value={search} onChange={(event) => { setSearch(event.target.value); setPage(1); }} placeholder="Search by customer name, phone, or customer ID..." aria-label="Search customers" /></label>
+            <select value={typeFilter} onChange={(event) => { setTypeFilter(event.target.value); setPage(1); }} aria-label="Filter by customer type">{["All Customer Types", "Individual", "Fleet", "Corporate"].map((type) => <option key={type}>{type}</option>)}</select>
+            <select value={statusFilter} onChange={(event) => { setStatusFilter(event.target.value); setPage(1); }} aria-label="Filter by customer status">{["All Status", "Active", "VIP", "Inactive", "Corporate"].map((status) => <option key={status}>{status}</option>)}</select>
+            <label className="customer-date-filter"><CalendarDays size={15} /><span>Last Visit (All Dates)</span></label>
+          </div>
+          <div className="customer-table-scroll">
+            <table className="customer-management-table">
+              <thead><tr><th>#</th><th>Customer ID</th><th>Customer Name</th><th>Phone</th><th>Customer Type</th><th>Vehicles</th><th>Last Visit</th><th>Total Spent</th><th>Status</th><th>Actions</th></tr></thead>
+              <tbody>
+                {pageCustomers.map((customer, index) => (
+                  <tr key={customer.id} className={selectedCustomer?.id === customer.id ? "selected" : ""} onClick={() => setSelectedId(customer.id)}>
+                    <td>{(currentPage - 1) * 10 + index + 1}</td>
+                    <td><button className="customer-id-link" onClick={(event) => { event.stopPropagation(); setSelectedId(customer.id); }}>{customer.id}</button></td>
+                    <td><span className="customer-name-cell"><span>{customer.initials}</span>{customer.name}</span></td>
+                    <td>{customer.phone}</td><td><span className={`customer-type-badge ${typeClass[customer.type]}`}>{customer.type}</span></td>
+                    <td>{customer.vehicleCount}</td><td>{customer.lastVisit}</td><td className="customer-amount">{money(customer.totalSpent)}</td>
+                    <td><span className={`customer-status-badge ${statusClass[customer.status]}`}>{customer.status}</span></td>
+                    <td><button className="customer-row-action" aria-label={`View ${customer.id}`} onClick={(event) => { event.stopPropagation(); setSelectedId(customer.id); }}><Eye size={15} /></button><button className="customer-row-action" aria-label={`More actions for ${customer.id}`} onClick={(event) => { event.stopPropagation(); notify(`More actions for ${customer.id} are not available in this frontend preview.`); }}><MoreVertical size={15} /></button></td>
+                  </tr>
+                ))}
+                {filteredCustomers.length === 0 && <tr><td colSpan={10} className="customer-empty">No customers match the selected filters.</td></tr>}
+              </tbody>
+            </table>
+          </div>
+          <footer className="customer-table-footer"><span>Showing {filteredCustomers.length ? (currentPage - 1) * 10 + 1 : 0} to {Math.min(currentPage * 10, filteredCustomers.length)} of {filteredCustomers.length} customers</span><div><button aria-label="Previous page" disabled={currentPage === 1} onClick={() => setPage(currentPage - 1)}><ChevronLeft size={16} /></button>{Array.from({ length: Math.min(5, pageCount) }, (_, index) => { const pageNumber = Math.min(Math.max(1, currentPage - 2), pageCount - 4) + index; return <button key={pageNumber} className={currentPage === pageNumber ? "active" : ""} aria-label={`Page ${pageNumber}`} aria-current={currentPage === pageNumber ? "page" : undefined} onClick={() => setPage(pageNumber)}>{pageNumber}</button>; })}<button aria-label="Next page" disabled={currentPage === pageCount} onClick={() => setPage(currentPage + 1)}><ChevronRight size={16} /></button></div></footer>
+        </section>
+        {selectedCustomer && (
+          <aside className="customer-detail-card" aria-label={`Customer details for ${selectedCustomer.id}`}>
+            <header><div><FileText size={16} /><strong>Customer Details</strong></div><button onClick={() => notify("Customer editing is not available in this frontend preview.")}>Edit</button></header>
+            <div className="customer-detail-heading"><span className="customer-large-avatar">{selectedCustomer.initials}</span><div><strong>{selectedCustomer.name}</strong><span><Phone size={13} />{selectedCustomer.phone}</span><span><Mail size={13} />{selectedCustomer.email}</span><span><MapPin size={13} />{selectedCustomer.address}</span></div><span className={`customer-status-badge ${statusClass[selectedCustomer.status]}`}>{selectedCustomer.status}</span></div>
+            <div className="customer-detail-facts">
+              <div><UserRound size={15} /><span>Customer Type</span><strong>{selectedCustomer.type}</strong></div>
+              <div><CarFront size={15} /><span>Total Vehicles</span><strong>{selectedCustomer.vehicleCount}</strong></div>
+              <div><Wrench size={15} /><span>Total Visits</span><strong>{selectedCustomer.history.length * 4}</strong></div>
+              <div><FileText size={15} /><span>Total Spent</span><strong>{money(selectedCustomer.totalSpent)}</strong></div>
+              <div><CalendarDays size={15} /><span>Last Service Date</span><strong>{selectedCustomer.lastVisit}</strong></div>
+              <div><CalendarDays size={15} /><span>Member Since</span><strong>10 Jan 2022</strong></div>
+            </div>
+            <section className="customer-notes"><h3><FileText size={15} />Recent Notes</h3><p>{selectedCustomer.notes}</p></section>
+            <section className="customer-associated-vehicles">
+              <h3><CarFront size={16} />Associated Vehicles ({selectedCustomer.vehicleCount})<button onClick={() => notify(`Showing vehicles for ${selectedCustomer.name}.`)}>View All</button></h3>
+              <div className="customer-detail-table-scroll"><table><thead><tr><th>Vehicle</th><th>Year</th><th>Plate No.</th><th>Last Service</th></tr></thead><tbody>{selectedCustomer.vehicles.map((vehicle) => <tr key={`${selectedCustomer.id}-${vehicle.plate}`}><td>{vehicle.model}</td><td>{vehicle.year}</td><td>{vehicle.plate}</td><td>{vehicle.lastService}</td></tr>)}</tbody></table></div>
+            </section>
+            <section className="customer-service-history">
+              <h3><Clock3 size={15} />Service History (Latest 3)<button onClick={() => notify(`Showing service history for ${selectedCustomer.name}.`)}>View All</button></h3>
+              <div className="customer-detail-table-scroll"><table><thead><tr><th>Date</th><th>Vehicle</th><th>Service</th><th>Amount</th></tr></thead><tbody>{selectedCustomer.history.map((record) => <tr key={`${selectedCustomer.id}-${record.date}`}><td>{record.date}</td><td>{record.vehicle}</td><td>{record.service}</td><td>{money(record.amount)}</td></tr>)}</tbody></table></div>
+            </section>
+            <div className="customer-detail-actions">
+              <button onClick={() => notify(`Showing service history for ${selectedCustomer.name}.`)}><Clock3 size={14} />View History</button>
+              <button onClick={() => notify("Customer editing is not available in this frontend preview.")}><UserRound size={14} />Edit Customer</button>
+              <button className="customer-work-order" onClick={onCreateWorkOrder}><FileText size={14} />Create Work Order</button>
+            </div>
+          </aside>
+        )}
+      </div>
+    </main>
+  );
+}
+
+export default Customers;
